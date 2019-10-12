@@ -1,8 +1,8 @@
 class Memory:
-    def __init__(self):
+    def __init__(self, starting_address, length):
         self._memory = []
-        self._length = -1
-        self._starting_address = -1
+        self._length = length
+        self._starting_address = starting_address
 
     @property
     def memory(self):

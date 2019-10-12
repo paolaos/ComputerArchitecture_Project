@@ -1,12 +1,12 @@
-import cpu.Cache as Cache
+from cpu.Cache import Cache
 
 class Core:
     def __init__(self):
         self._registers = []
         self._instructions_register = -1
         self._current_instruction = []
-        self._data_cache = Cache
-        self._instructions_cache = Cache
+        self._data_cache = Cache()
+        self._instructions_cache = Cache()
 
     @property
     def registers(self):

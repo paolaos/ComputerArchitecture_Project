@@ -1,16 +1,16 @@
-import cpu.Memory as Memory
-import cpu.Core as Core
-import cpu.ProgramsContext as ProgramsContext
+from cpu.Memory import Memory
+from cpu.Core import Core
+from cpu.ProgramsContext import ProgramsContext
 
 class Processor:
     """Main function that calls all fundamental components from CPU"""
     def __init__(self):
         self._clock = 0
-        self._data_memory = Memory
-        self._instructions_memory = Memory
-        self._core_1 = Core
-        self._core_2 = Core
-        self._contexts = ProgramsContext
+        self._data_memory = Memory(0, 380)
+        self._instructions_memory = Memory(381, 636)
+        self._core_1 = Core()
+        self._core_2 = Core()
+        self._contexts = ProgramsContext()
         self._data_bus = 0
         self._instructions_bus = 0
 
