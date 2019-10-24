@@ -1,5 +1,6 @@
 from cpu.Cache import Cache
 
+
 class Core:
     def __init__(self):
         self._registers = []
