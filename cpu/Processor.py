@@ -1,6 +1,9 @@
 from cpu.Memory import Memory
 from cpu.Core import Core
+from cpu.Block import Block
 from cpu.ProgramsContext import ProgramsContext
+import os
+
 
 class Processor:
     """Main function that calls all fundamental components from CPU"""
@@ -13,6 +16,40 @@ class Processor:
         self._contexts = ProgramsContext()
         self._data_bus = 0
         self._instructions_bus = 0
+
+    def kick_start_program(self):
+        self.load_memory_instructions()
+        self.instantiate_data_memory()
+        return 0
+
+    def load_memory_instructions(self):
+        current_block_number = 24
+        for file_name in os.listdir('assets'):
+            file_ = open(file_name, 'r')
+            last_block_number = self.store_instructions_in_memory(file_, current_block_number)
+            current_block_number = last_block_number + 1
+
+    def store_instructions_in_memory(self, file_, current_block_number):
+        line = file_.readline()
+        while line:
+            split_line = line.split()
+            block = self.create_instruction_block(split_line, current_block_number)
+            self._instructions_memory.memory.extend(block)
+            current_block_number = current_block_number + 1
+
+        return current_block_number
+
+    def create_instruction_block(self, line, number):
+        temporary_block = Block()
+        temporary_block.block_id = number
+        temporary_block.word_0 = line[0]
+        temporary_block.word_1 = line[1]
+        temporary_block.word_2 = line[2]
+        temporary_block.word_3 = line[3]
+        return temporary_block
+
+    def instantiate_data_memory(self):
+        return 0
 
     @property
     def clock(self):
