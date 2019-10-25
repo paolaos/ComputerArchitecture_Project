@@ -21,3 +21,6 @@ class CacheLine:
     @block.setter
     def block(self, block):
         self._block = block
+
+    def get_block_id(self):
+        return self.block.block_id

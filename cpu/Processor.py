@@ -1,3 +1,4 @@
+from threading import Thread, Event, Lock
 from cpu.Memory import Memory
 from cpu.Core import Core
 from cpu.ProgramsContext import ProgramsContext
@@ -11,8 +12,9 @@ class Processor:
         self._core_1 = Core()
         self._core_2 = Core()
         self._contexts = ProgramsContext()
-        self._data_bus = 0
-        self._instructions_bus = 0
+        self._data_bus = Lock()
+        self._instructions_bus = Lock()
+
 
     @property
     def clock(self):
@@ -77,3 +79,13 @@ class Processor:
     @instructions_bus.setter
     def instructions_bus(self, instructions_bus):
         self._instructions_bus = instructions_bus
+
+    def assign_program_to_core_1(self, program_context):
+        self.core_1.run_program(program_context)
+
+    def assign_program_to_core_2(self, program_context):
+        self.core_2.run_program(program_context)
+
+    def get_next_program(self):
+        print('todo')
+    # return the next program in program_context that has taken = False

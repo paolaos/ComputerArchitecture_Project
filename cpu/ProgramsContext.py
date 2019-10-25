@@ -1,7 +1,7 @@
 class ProgramsContext:
     def __init__(self):
         self._context_id = -1
-        self._start_address = 0
+        self._start_address = 0     # starting address from the instructions memory
         self._assigned_core = -1
         self._taken = False
         self._starting_clock_cycle = -1

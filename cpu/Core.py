@@ -1,4 +1,5 @@
 from cpu.Cache import Cache
+from cpu.ProgramsContext import ProgramsContext
 
 
 class Core:
@@ -48,3 +49,6 @@ class Core:
     @instructions_cache.setter
     def instructions_cache(self, instructions_cache):
         self._instructions_cache = instructions_cache
+
+    def run_program(self, program_context):
+        print('todo')
