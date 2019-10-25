@@ -34,7 +34,7 @@ class Processor:
         while line:
             split_line = line.split()
             block = self.create_instruction_block(split_line, current_block_number)
-            self._instructions_memory.memory.extend(block)
+            self._instructions_memory.memory(self._instructions_memory.memory().extend(block))
             current_block_number = current_block_number + 1
 
         return current_block_number
@@ -42,13 +42,21 @@ class Processor:
     def create_instruction_block(self, line, number):
         temporary_block = Block()
         temporary_block.block_id = number
-        temporary_block.word_0 = line[0]
-        temporary_block.word_1 = line[1]
-        temporary_block.word_2 = line[2]
-        temporary_block.word_3 = line[3]
+        temporary_block.word_0(line[0])
+        temporary_block.word_1(line[1])
+        temporary_block.word_2(line[2])
+        temporary_block.word_3(line[3])
         return temporary_block
 
     def instantiate_data_memory(self):
+        for i in range(0, 24):
+            block = Block()
+            block.block_id(i)
+            block.word_0([0, 0, 0, 0])
+            block.word_1([0, 0, 0, 0])
+            block.word_2([0, 0, 0, 0])
+            block.word_3([0, 0, 0, 0])
+
         return 0
 
     @property
