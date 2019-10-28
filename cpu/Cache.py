@@ -65,28 +65,28 @@ class Cache:
         if self.is_block_in_cache(block_id):
             line = self.get_block_line(block_id)
             if line == 0:
-                self.cache_line_0.status = False
+                self.cache_line_0.status(False)
             if line == 1:
-                self.cache_line_1.status = False
+                self.cache_line_1.status(False)
             if line == 2:
-                self.cache_line_2.status = False
+                self.cache_line_2.status(False)
             if line == 3:
-                self.cache_line_3.status = False
+                self.cache_line_3.status(False)
 
     def load_block_to_cache(self, block):
         line = self.get_block_line(block.block_id)
         if line == 0:
-            self.cache_line_0.block = block
-            self.cache_line_0.status = True
+            self.cache_line_0.block(block)
+            self.cache_line_0.status(True)
         if line == 1:
-            self.cache_line_1.block = block
-            self.cache_line_1.status = True
+            self.cache_line_1.block(block)
+            self.cache_line_1.status(True)
         if line == 2:
-            self.cache_line_2.block = block
-            self.cache_line_2.status = True
+            self.cache_line_2.block(block)
+            self.cache_line_2.status(True)
         if line == 3:
-            self.cache_line_3.block = block
-            self.cache_line_3.status = True
+            self.cache_line_3.block(block)
+            self.cache_line_3.status(True)
 
     def get_block(self, block_id):
         if self.is_block_in_cache(block_id):

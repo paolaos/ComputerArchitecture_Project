@@ -1,14 +1,20 @@
 from cpu.Cache import Cache
+import threading
 from cpu.ProgramsContext import ProgramsContext
 
 
+REGISTERS_AMOUNT = 32
+
+
 class Core:
-    def __init__(self):
-        self._registers = []
+    def __init__(self, data_cache, instruction_cache):
+        self._registers = [0] * REGISTERS_AMOUNT
         self._instructions_register = -1
         self._current_instruction = []
-        self._data_cache = Cache()
-        self._instructions_cache = Cache()
+
+        self.my_data = threading.local()
+        self.my_data.data_cache = data_cache
+        self.my_data.instructions_cache = instruction_cache
 
     @property
     def registers(self):
