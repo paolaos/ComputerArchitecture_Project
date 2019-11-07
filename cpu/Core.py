@@ -1,7 +1,8 @@
 from cpu.Cache import Cache
+from cpu.Block import Block
 import threading
 from cpu.ProgramsContext import ProgramsContext
-
+from functools import partial
 
 REGISTERS_AMOUNT = 32
 
@@ -58,3 +59,45 @@ class Core:
 
     def run_program(self, program_context):
         print('todo')
+
+    def decode_instructions(self, block):
+        instruction_number = block[0]
+
+        def addi():
+            block[0] = block[1] + block[2]
+            return block
+
+        def add():
+            return 0
+
+        def sub():
+            return 0
+
+        def mul():
+            return 0
+
+        def div():
+            return 0
+
+
+        switcher = {
+            19: addi,
+            71: add,
+            83: sub,
+            72: mul,
+            56: div,
+            5: 'lw',
+            37: 'sw',
+            99: 'beq',
+            100: 'bne',
+            111: 'jal',
+            103: 'jalr',
+            999: 'END'
+
+        }
+
+        instruction = switcher.get(instruction_number, lambda: "Instruction does not exist")
+        return instruction()
+
+
+
