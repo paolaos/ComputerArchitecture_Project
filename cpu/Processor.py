@@ -95,12 +95,12 @@ class Processor:
     def kick_start_program(self):
         self.load_memory_instructions()
         self.instantiate_data_memory()
-        return 0
+        # to be completed
 
     def load_memory_instructions(self):
         current_block_number = 24
-        for file_name in os.listdir('assets'):
-            file_ = open(file_name, 'r')
+        for file_name in os.listdir('../assets'):
+            file_ = open('../assets/' + file_name, 'r')
             last_block_number = self.store_instructions_in_memory(file_, current_block_number)
             current_block_number = last_block_number + 1
 
@@ -108,20 +108,24 @@ class Processor:
         line = file_.readline()
         while line:
             split_line = line.split()
-            block = self.create_instruction_block(split_line, current_block_number)
-            self._instructions_memory.memory(self._instructions_memory.memory().extend(block))
+            if current_block_number % 4 == 0:
+                temporary_block = Block()
+                temporary_block.block_id = current_block_number
+                temporary_block.word_0 = split_line
+            else:
+                if current_block_number % 4 == 1:
+                    temporary_block.word_1 = split_line
+                else:
+                    if current_block_number % 4 == 2:
+                        temporary_block.word_2 = split_line
+                    else:
+                        temporary_block.word_3 = split_line
+                        self.instructions_memory.memory.append(temporary_block)
+
+            line = file_.readline()
             current_block_number = current_block_number + 1
 
         return current_block_number
-
-    def create_instruction_block(self, line, number):
-        temporary_block = Block()
-        temporary_block.block_id = number
-        temporary_block.word_0(line[0])
-        temporary_block.word_1(line[1])
-        temporary_block.word_2(line[2])
-        temporary_block.word_3(line[3])
-        return temporary_block
 
     def instantiate_data_memory(self):
         for i in range(0, 24):
@@ -131,8 +135,6 @@ class Processor:
             block.word_1([0, 0, 0, 0])
             block.word_2([0, 0, 0, 0])
             block.word_3([0, 0, 0, 0])
-
-        return 0
 
 
     def assign_program_to_core_1(self, program_context):
