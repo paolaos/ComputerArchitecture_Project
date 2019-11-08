@@ -8,9 +8,9 @@ REGISTERS_AMOUNT = 32
 
 
 class Core(Thread):
-    def __init__(self, id, data_cache, instruction_cache, processor, data_bus, instruction_bus):
+    def __init__(self, core_id, data_cache, instruction_cache, processor, data_bus, instruction_bus):
         Thread.__init__(self)
-        self.core_id = id
+        self.core_id = core_id
         self._registers = [0] * REGISTERS_AMOUNT
         self._instructions_register = -1
         self._current_instruction = []

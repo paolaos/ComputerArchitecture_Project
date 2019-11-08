@@ -21,9 +21,10 @@ class Processor:
         self.core_1_instruction_cache = Cache()
         self.core_2_instruction_cache = Cache()
         self.core_2_data_cache = Cache()
-
-        # self.core_1 = Core(self.core_1_data_cache, self.core_1_instruction_cache)
-        # self.core_2 = Core(self.core_2_data_cache, self.core_2_instruction_cache)
+        self.core_1 = Core(1, self.core_1_data_cache, self.core_1_instruction_cache, self, self.data_bus,
+                           self.instruction_bus)
+        self.core_2 = Core(2, self.core_1_data_cache, self.core_1_instruction_cache, self, self.data_bus,
+                           self.instruction_bus)
 
         self.contexts = []
 
@@ -95,7 +96,9 @@ class Processor:
     def kick_start_program(self):
         self.load_memory_instructions()
         self.instantiate_data_memory()
-        # to be completed
+        self.core_1.run()
+        self.core_2.run()
+        # todo add ending of the program
 
     def load_memory_instructions(self):
         current_block_number = 24
@@ -136,17 +139,3 @@ class Processor:
             block.word_2([0, 0, 0, 0])
             block.word_3([0, 0, 0, 0])
 
-
-    def assign_program_to_core_1(self, program_context):
-        self.core_1.run_program(program_context)
-
-    def assign_program_to_core_2(self, program_context):
-        self.core_2.run_program(program_context)
-
-    def get_next_program(self):
-        print('todo')
-    # return the next program in program_context that has taken = False
-
-    def init_threads(self):
-        self.core_1 = Thread(target=self.run, args=(), name="core1")
-        self.core_2 = Thread(target=self.run, args=(), name="core2")

@@ -1,12 +1,12 @@
-from threading import Thread, Event
 from cpu.Processor import Processor
+from cpu.Core import Core
 from cpu.Sync import Sync
 
 
 def main():
     processor = Processor()
 
-    # load program files
+    processor.kick_start_program()
 
     # create threads for cores
 

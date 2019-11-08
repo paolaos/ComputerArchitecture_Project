@@ -142,12 +142,21 @@ class Cache:
         return int(address % BLOCK_SIZE)
 
     def load_block(self, address):
+        """
+
+        :param address:
+        :return:
+        """
         block_number = self.get_block_number_from_address(address)
-        block = None
-        # self.memory.get_block(block)
+        block = self.memory.get_block(block_number)
         self.store_block_to_cache(block)
 
     def get_word_from_address(self, address):
+        """
+
+        :param address:
+        :return:
+        """
         block_number = self.get_block_number_from_address(address)
         is_block_in_cache = self.is_block_in_cache(block_number)
         if not is_block_in_cache:
