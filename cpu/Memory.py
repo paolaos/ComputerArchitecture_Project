@@ -30,3 +30,6 @@ class Memory:
     @starting_address.setter
     def starting_address(self, starting_address):
         self._starting_address = starting_address
+
+    def get_block(self, block_index):
+        return self._memory[block_index - 24] if self._starting_address == 24 else self._memory[block_index]
