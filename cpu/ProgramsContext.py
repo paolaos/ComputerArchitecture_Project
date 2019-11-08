@@ -1,3 +1,7 @@
+
+REGISTERS_AMOUNT = 32
+
+
 class ProgramsContext:
     def __init__(self):
         self._context_id = -1
@@ -6,7 +10,7 @@ class ProgramsContext:
         self._taken = False
         self._starting_clock_cycle = -1
         self._ending_clock_cycle = -1
-        self._registers = []
+        self._registers = [0] * REGISTERS_AMOUNT
 
     @property
     def context_id(self):

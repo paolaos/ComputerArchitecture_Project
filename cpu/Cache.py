@@ -42,13 +42,19 @@ class Cache:
         self._cache_line_3 = cache_line
 
     def get_block_line(self, block_id):
-        return block_id % self._size
+        """
+        Get the line where a bloc should be stored in the cache
+        :param block_id: the id of the block
+        :return: The line number
+        """
+        return int(block_id % self._size)
 
     def is_block_in_cache(self, block_id):
-        """Return a boolean that indicates if the block is valid in the cache
-
-            True: hit
-            False: miss """
+        """
+        Check if a block is valid in the cache
+        :param block_id:
+        :return: True: hit, False: miss
+        """
         line = self.get_block_line(block_id)
         in_cache = False
         if line == 0:
@@ -62,6 +68,11 @@ class Cache:
         return in_cache
 
     def invalidate_block(self, block_id):
+        """
+        Invalidate a block in cache
+        :param block_id:
+        :return:
+        """
         if self.is_block_in_cache(block_id):
             line = self.get_block_line(block_id)
             if line == 0:
@@ -73,7 +84,11 @@ class Cache:
             if line == 3:
                 self.cache_line_3.status(False)
 
-    def load_block_to_cache(self, block):
+    def store_block_to_cache(self, block):
+        """
+        Store a block in the cache
+        :param block: the block that is going to be stored
+        """
         line = self.get_block_line(block.block_id)
         if line == 0:
             self.cache_line_0.block(block)
@@ -89,6 +104,11 @@ class Cache:
             self.cache_line_3.status(True)
 
     def get_block(self, block_id):
+        """
+        Get the block
+        :param block_id: the id of the block to be retrieved
+        :return: the block
+        """
         if self.is_block_in_cache(block_id):
             line = self.get_block_line(block_id)
             if line == 0:
