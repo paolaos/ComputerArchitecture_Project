@@ -13,5 +13,4 @@ class ProgramsContext:
         self.registers = [0] * REGISTERS_AMOUNT
 
     def print_registers(self):
-        for x in self.registers:
-            print(x)
+        print(self.registers)
