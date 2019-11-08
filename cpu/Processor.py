@@ -15,7 +15,7 @@ class Processor:
         self.data_bus = Sync()
         self.instruction_bus = Sync()
         self.data_memory = Memory(0, 380)
-        self.instructions_memory = Memory(0, 380)
+        self.instructions_memory = Memory(24, 636)
 
         self.core_1_data_cache = Cache()
         self.core_1_instruction_cache = Cache()
