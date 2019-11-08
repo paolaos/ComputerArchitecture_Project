@@ -1,13 +1,18 @@
 from cpu.CacheLine import CacheLine
+from cpu.Memory import Memory
+
+BLOCK_SIZE = 16
 
 
 class Cache:
-    def __init__(self):
+    def __init__(self, memory):
         self._cache_line_0 = CacheLine()
         self._cache_line_1 = CacheLine()
         self._cache_line_2 = CacheLine()
         self._cache_line_3 = CacheLine()
         self._size = 4
+        self.memory: Memory = memory
+
 
     @property
     def cache_line_0(self):
@@ -119,3 +124,38 @@ class Cache:
                 return self.cache_line_2.block
             if line == 3:
                 return self.cache_line_3.block
+
+    def get_block_number_from_address(self, address):
+        """
+
+        :param address:
+        :return:
+        """
+        return int(address // BLOCK_SIZE)
+
+    def get_word_number_from_address(self, address):
+        """
+
+        :param address:
+        :return:
+        """
+        return int(address % BLOCK_SIZE)
+
+    def load_block(self, address):
+        block_number = self.get_block_number_from_address(address)
+        block = None
+        # self.memory.get_block(block)
+        self.store_block_to_cache(block)
+
+    def get_word_from_address(self, address):
+        block_number = self.get_block_number_from_address(address)
+        is_block_in_cache = self.is_block_in_cache(block_number)
+        if not is_block_in_cache:
+            # miss
+            self.load_block(address)
+
+        is_block_in_cache = self.is_block_in_cache(block_number)
+        if is_block_in_cache:
+            # hit
+            block = self.get_block(block_number)
+            return block.get_word_from_number(self.get_word_number_from_address(address))

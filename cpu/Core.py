@@ -1,20 +1,28 @@
 from threading import Thread, local
-from cpu.ProgramsContextHelper import get_next_pending_program
+from cpu.ProgramsContextHelper import get_next_pending_program, save_context
+from cpu.ProgramsContext import ProgramsContext
+from cpu.Cache import Cache
+from cpu.Processor import Processor
 
 REGISTERS_AMOUNT = 32
 
 
 class Core(Thread):
-    def __init__(self, data_cache, instruction_cache, processor):
+    def __init__(self, id, data_cache, instruction_cache, processor, data_bus, instruction_bus):
         Thread.__init__(self)
+        self.core_id = id
         self._registers = [0] * REGISTERS_AMOUNT
         self._instructions_register = -1
         self._current_instruction = []
 
-        self.processor = processor
-        self.my_data = local()
-        self.my_data.data_cache = data_cache
-        self.my_data.instructions_cache = instruction_cache
+        self.processor: Processor = processor
+        self.data_cache: Cache = data_cache
+        self.instructions_cache = instruction_cache
+        self.pc = -1
+
+        self.data_bus = data_bus
+        self.instruction_bus = instruction_bus
+        self.actual_program: ProgramsContext = None
 
     @property
     def registers(self):
@@ -56,10 +64,7 @@ class Core(Thread):
     def instructions_cache(self, instructions_cache):
         self._instructions_cache = instructions_cache
 
-    def run_program(self, program_context):
-        print('todo')
-
-    def decode_instructions(self):
+    def decode_instruction(self):
         instruction_number = self.current_instruction[0]
 
         def addi():
@@ -85,7 +90,7 @@ class Core(Thread):
         def div():
             x = self.registers[self.current_instruction[2]]
             n = self.registers[self.current_instruction[3]]
-            self.registers[self.current_instruction[1]] = int(x / n)
+            self.registers[self.current_instruction[1]] = x // n
 
         def lw():
             print('Load instruction')
@@ -106,6 +111,14 @@ class Core(Thread):
             print('jalr')
 
         def end():
+            # Save ending registers
+            self.actual_program.registers = self.registers
+            # TODO save clock
+            save_context(self.actual_program, self.processor.contexts)
+            # Get next program to run it
+            self.actual_program: ProgramsContext = get_next_pending_program(self.processor.contexts)
+            self.actual_program.assigned_core = id
+            # TODO save starting clock
             print('end program')
 
         switcher = {
@@ -128,11 +141,15 @@ class Core(Thread):
         return instruction()
 
     def run(self):
-        actual_program = get_next_pending_program(self.processor.contexts)
-
-        while actual_program is not None:
+        self.actual_program: ProgramsContext = get_next_pending_program(self.processor.contexts)
+        self.actual_program.assigned_core = id
+        # TODO save starting clock
+        while self.actual_program is not None:
             print('Running program.')
+            self.pc = self.actual_program.start_address
+            # set current instruction
+            self.current_instruction = self.instructions_cache.get_word_from_address(self.pc)
 
-            actual_program = get_next_pending_program(self.processor.contexts)
+            self.decode_instruction()
 
         return 0
