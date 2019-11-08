@@ -6,45 +6,13 @@ BLOCK_SIZE = 16
 
 class Cache:
     def __init__(self, memory):
-        self._cache_line_0 = CacheLine()
-        self._cache_line_1 = CacheLine()
-        self._cache_line_2 = CacheLine()
-        self._cache_line_3 = CacheLine()
-        self._size = 4
+        self.cache_line_0 = CacheLine()
+        self.cache_line_1 = CacheLine()
+        self.cache_line_2 = CacheLine()
+        self.cache_line_3 = CacheLine()
+        self.size = 4
         self.memory: Memory = memory
 
-
-    @property
-    def cache_line_0(self):
-        return self._cache_line_0
-
-    @cache_line_0.setter
-    def cache_line_0(self, cache_line):
-        self._cache_line_0 = cache_line
-
-    @property
-    def cache_line_1(self):
-        return self._cache_line_1
-
-    @cache_line_1.setter
-    def cache_line_1(self, cache_line):
-        self._cache_line_1 = cache_line
-
-    @property
-    def cache_line_2(self):
-        return self._cache_line_2
-
-    @cache_line_2.setter
-    def cache_line_2(self, cache_line):
-        self._cache_line_2 = cache_line
-
-    @property
-    def cache_line_3(self):
-        return self._cache_line_3
-
-    @cache_line_3.setter
-    def cache_line_3(self, cache_line):
-        self._cache_line_3 = cache_line
 
     def get_block_line(self, block_id):
         """
@@ -52,7 +20,7 @@ class Cache:
         :param block_id: the id of the block
         :return: The line number
         """
-        return int(block_id % self._size)
+        return int(block_id % self.size)
 
     def is_block_in_cache(self, block_id):
         """
@@ -96,17 +64,17 @@ class Cache:
         """
         line = self.get_block_line(block.block_id)
         if line == 0:
-            self.cache_line_0.block(block)
-            self.cache_line_0.status(True)
+            self.cache_line_0.block = block
+            self.cache_line_0.status = True
         if line == 1:
-            self.cache_line_1.block(block)
-            self.cache_line_1.status(True)
+            self.cache_line_1.block = block
+            self.cache_line_1.status = True
         if line == 2:
-            self.cache_line_2.block(block)
-            self.cache_line_2.status(True)
+            self.cache_line_2.block = block
+            self.cache_line_2.status = True
         if line == 3:
-            self.cache_line_3.block(block)
-            self.cache_line_3.status(True)
+            self.cache_line_3.block = block
+            self.cache_line_3.status = True
 
     def get_block(self, block_id):
         """

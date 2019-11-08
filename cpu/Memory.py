@@ -1,6 +1,3 @@
-from cpu.Block import Block
-
-
 class Memory:
     def __init__(self, starting_address, length):
         self._memory = []
