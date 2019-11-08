@@ -1,19 +1,18 @@
-from cpu.Cache import Cache
-from cpu.Block import Block
-import threading
-from cpu.ProgramsContext import ProgramsContext
-from functools import partial
+from threading import Thread, local
+from cpu.ProgramsContextHelper import get_next_pending_program
 
 REGISTERS_AMOUNT = 32
 
 
-class Core:
-    def __init__(self, data_cache, instruction_cache):
+class Core(Thread):
+    def __init__(self, data_cache, instruction_cache, processor):
+        Thread.__init__(self)
         self._registers = [0] * REGISTERS_AMOUNT
         self._instructions_register = -1
         self._current_instruction = []
 
-        self.my_data = threading.local()
+        self.processor = processor
+        self.my_data = local()
         self.my_data.data_cache = data_cache
         self.my_data.instructions_cache = instruction_cache
 
@@ -60,25 +59,54 @@ class Core:
     def run_program(self, program_context):
         print('todo')
 
-    def decode_instructions(self, block):
-        instruction_number = block[0]
+    def decode_instructions(self):
+        instruction_number = self.current_instruction[0]
 
         def addi():
-            block[0] = block[1] + block[2]
-            return block
+            x = self.registers[self.current_instruction[2]]
+            n = self.current_instruction[3]
+            self.registers[self.current_instruction[1]] = x + n
 
         def add():
-            return 0
+            x = self.registers[self.current_instruction[2]]
+            n = self.registers[self.current_instruction[3]]
+            self.registers[self.current_instruction[1]] = x + n
 
         def sub():
-            return 0
+            x = self.registers[self.current_instruction[2]]
+            n = self.registers[self.current_instruction[3]]
+            self.registers[self.current_instruction[1]] = x - n
 
         def mul():
-            return 0
+            x = self.registers[self.current_instruction[2]]
+            n = self.registers[self.current_instruction[3]]
+            self.registers[self.current_instruction[1]] = x * n
 
         def div():
-            return 0
+            x = self.registers[self.current_instruction[2]]
+            n = self.registers[self.current_instruction[3]]
+            self.registers[self.current_instruction[1]] = int(x / n)
 
+        def lw():
+            print('Load instruction')
+
+        def sw():
+            print('Store instruction')
+
+        def beq():
+            print('Branch eq')
+
+        def bne():
+            print('Branch ne')
+
+        def jal():
+            print('jal')
+
+        def jalr():
+            print('jalr')
+
+        def end():
+            print('end program')
 
         switcher = {
             19: addi,
@@ -86,18 +114,25 @@ class Core:
             83: sub,
             72: mul,
             56: div,
-            5: 'lw',
-            37: 'sw',
-            99: 'beq',
-            100: 'bne',
-            111: 'jal',
-            103: 'jalr',
-            999: 'END'
+            5: lw,
+            37: sw,
+            99: beq,
+            100: bne,
+            111: jal,
+            103: jalr,
+            999: end
 
         }
 
         instruction = switcher.get(instruction_number, lambda: "Instruction does not exist")
         return instruction()
 
+    def run(self):
+        actual_program = get_next_pending_program(self.processor.contexts)
 
+        while actual_program is not None:
+            print('Running program.')
 
+            actual_program = get_next_pending_program(self.processor.contexts)
+
+        return 0

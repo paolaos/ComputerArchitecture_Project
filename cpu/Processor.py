@@ -25,7 +25,7 @@ class Processor:
         # self.core_1 = Core(self.core_1_data_cache, self.core_1_instruction_cache)
         # self.core_2 = Core(self.core_2_data_cache, self.core_2_instruction_cache)
 
-        self.contexts = ProgramsContext()
+        self.contexts = []
 
     @property
     def clock(self):
@@ -146,5 +146,5 @@ class Processor:
     # return the next program in program_context that has taken = False
 
     def init_threads(self):
-        self.core_1 = Thread(None, None, "core1")
-        self.core_2 = Thread(None, None, "core2")
+        self.core_1 = Thread(target=self.run, args=(), name="core1")
+        self.core_2 = Thread(target=self.run, args=(), name="core2")
