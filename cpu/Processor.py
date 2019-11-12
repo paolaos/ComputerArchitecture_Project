@@ -3,6 +3,8 @@ from cpu.Core import Core
 from cpu.Sync import Sync
 from cpu.Cache import Cache
 from cpu.ProgramsContextHelper import create_context
+from cpu.ProgramsContext import ProgramsContext
+from threading import Lock
 import os
 
 
@@ -19,20 +21,36 @@ class Processor:
         self.core_1_instruction_cache = Cache(self.memory)
         self.core_2_instruction_cache = Cache(self.memory)
         self.core_2_data_cache = Cache(self.memory)
+
         self.core_1 = Core(1, self.core_1_data_cache, self.core_1_instruction_cache, self, self.data_bus,
                            self.instruction_bus)
         self.core_2 = Core(2, self.core_2_data_cache, self.core_2_instruction_cache, self, self.data_bus,
                            self.instruction_bus)
 
         self.contexts = []
+        self.context_lock = Lock()
 
     # Processor methods
     def kick_start_program(self):
         self.load_memory_instructions()
-        self.core_1.run()
-        self.core_2.run()
+        self.core_1.start()
+        self.core_2.start()
+        self.core_1.join()
+        self.core_2.join()
         self.print_final_program_context()
         # todo add ending of the program
+
+    def get_next_program(self):
+        program: ProgramsContext = ProgramsContext()
+        tries = 0
+        with self.context_lock:
+            while program.context_id == -1 and tries < len(self.contexts):
+                if not self.contexts[tries].taken:
+                    program = self.contexts[tries]
+                tries += 1
+
+            program.taken = True
+        return program
 
     def load_memory_instructions(self):
         current_file_number = 0

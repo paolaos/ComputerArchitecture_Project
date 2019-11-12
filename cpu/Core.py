@@ -3,6 +3,7 @@ from cpu.ProgramsContextHelper import get_next_pending_program, save_context
 from cpu.ProgramsContext import ProgramsContext
 from cpu.Cache import Cache
 from cpu.Instruction import Instruction
+import time
 
 REGISTERS_AMOUNT = 32
 
@@ -89,7 +90,9 @@ class Core(Thread):
             self.pc = self.actual_program.start_address
 
     def run(self):
-        self.actual_program = get_next_pending_program(self.processor.contexts)
+        self.actual_program = self.processor.get_next_program()
+        print(self.core_id)
+        time.sleep(3)
         self.actual_program.assigned_core = self.core_id
         self.actual_program.taken = True
         self.pc = self.actual_program.start_address

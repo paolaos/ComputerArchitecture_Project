@@ -1,9 +1,10 @@
-
+from threading import Lock
 REGISTERS_AMOUNT = 32
 
 
 class ProgramsContext:
     def __init__(self):
+        self.lock = Lock()
         self.context_id = -1
         self.start_address = 0     # starting address from the instructions memory
         self.assigned_core = -1
@@ -14,3 +15,4 @@ class ProgramsContext:
 
     def print_registers(self):
         print(self.registers)
+
