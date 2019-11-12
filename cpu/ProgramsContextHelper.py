@@ -1,17 +1,6 @@
 from cpu.ProgramsContext import ProgramsContext
 
 
-def get_next_pending_program(context: []):
-    program = ProgramsContext()
-    tries = 0
-
-    while program.context_id == -1 and tries < len(context):
-        if not context[tries].taken:
-            program = context[tries]
-        tries += 1
-    return program
-
-
 def save_context(program_context: ProgramsContext, context: []):
     i = 0
     while i < len(context):

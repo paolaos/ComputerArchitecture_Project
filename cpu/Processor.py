@@ -7,6 +7,11 @@ from cpu.ProgramsContext import ProgramsContext
 from threading import Lock
 import os
 
+LOAD_INSTRUCTION_TO_CACHE = 10
+LOAD_DATA_TO_CACHE = 20
+WRITE_A_WORD = 5
+INVALIDATE_BLOCK = 1
+
 
 class Processor:
     def __init__(self):
@@ -17,15 +22,15 @@ class Processor:
         self.instructions_memory = Memory(24, 636)
         self.memory = Memory(0, 1024)
 
-        self.core_1_data_cache = Cache(self.memory)
-        self.core_1_instruction_cache = Cache(self.memory)
-        self.core_2_instruction_cache = Cache(self.memory)
-        self.core_2_data_cache = Cache(self.memory)
+        self.core_1_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
+        self.core_1_instruction_cache = Cache(self.memory, LOAD_INSTRUCTION_TO_CACHE)
+        self.core_2_instruction_cache = Cache(self.memory, LOAD_INSTRUCTION_TO_CACHE)
+        self.core_2_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
 
         self.core_1 = Core(1, self.core_1_data_cache, self.core_1_instruction_cache, self, self.data_bus,
-                           self.instruction_bus)
+                           self.instruction_bus, self.core_2_data_cache)
         self.core_2 = Core(2, self.core_2_data_cache, self.core_2_instruction_cache, self, self.data_bus,
-                           self.instruction_bus)
+                           self.instruction_bus, self.core_1_data_cache)
 
         self.contexts = []
         self.context_lock = Lock()
@@ -38,6 +43,7 @@ class Processor:
         self.core_1.join()
         self.core_2.join()
         self.print_final_program_context()
+        self.memory.print_memory()
         # todo add ending of the program
 
     def get_next_program(self):
