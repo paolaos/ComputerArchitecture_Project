@@ -46,11 +46,7 @@ class Memory:
         # debugging purposes
         print("\nState of the memory")
         i = 0
-        k = 0
-        times = int(len(self.memory) / 16)
-        if len(self.memory) % times > 0:
-            times -= 1
-        while k < times:
+        while i < len(self.memory):
             print(self.memory[i], "\t", self.memory[i+1], "\t", self.memory[i+2], "\t", self.memory[i+3], "\t|\t",
                   self.memory[i+4], "\t", self.memory[i+5], "\t", self.memory[i+6], "\t", self.memory[i+7], "\t|\t",
                   self.memory[i+8], "\t", self.memory[i+9], "\t", self.memory[i+10], "\t", self.memory[i+11], "\t|\t",
