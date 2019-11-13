@@ -4,7 +4,7 @@ from cpu.Sync import Sync
 from cpu.Cache import Cache
 from cpu.ProgramsContextHelper import create_context
 from cpu.ProgramsContext import ProgramsContext
-from threading import Lock
+from threading import Lock, Barrier
 import os
 
 
@@ -13,19 +13,20 @@ class Processor:
         self.clock = 0
         self.data_bus = Sync()
         self.instruction_bus = Sync()
+        self.still_running = True
         self.data_memory = Memory(0, 380)
         self.instructions_memory = Memory(24, 636)
         self.memory = Memory(0, 1024)
-
+        self.counter_barrier = Barrier(2, timeout=3)
         self.core_1_data_cache = Cache(self.memory)
         self.core_1_instruction_cache = Cache(self.memory)
         self.core_2_instruction_cache = Cache(self.memory)
         self.core_2_data_cache = Cache(self.memory)
 
         self.core_1 = Core(1, self.core_1_data_cache, self.core_1_instruction_cache, self, self.data_bus,
-                           self.instruction_bus)
+                           self.instruction_bus, self.counter_barrier)
         self.core_2 = Core(2, self.core_2_data_cache, self.core_2_instruction_cache, self, self.data_bus,
-                           self.instruction_bus)
+                           self.instruction_bus, self.counter_barrier)
 
         self.contexts = []
         self.context_lock = Lock()

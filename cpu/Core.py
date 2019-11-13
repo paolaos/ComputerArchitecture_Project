@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, BrokenBarrierError
 from cpu.ProgramsContextHelper import get_next_pending_program, save_context
 from cpu.ProgramsContext import ProgramsContext
 from cpu.Cache import Cache
@@ -9,13 +9,13 @@ REGISTERS_AMOUNT = 32
 
 
 class Core(Thread):
-    def __init__(self, core_id, data_cache, instruction_cache, processor, data_bus, instruction_bus):
+    def __init__(self, core_id, data_cache, instruction_cache, processor, data_bus, instruction_bus, counter_barrier):
         Thread.__init__(self)
         self.core_id = core_id
         self.registers = [0] * REGISTERS_AMOUNT
         self.instructions_register = -1
         self.current_instruction = Instruction(-1, -1, -1, -1)
-
+        self.counter_barrier = counter_barrier
         self.processor = processor
         self.data_cache: Cache = data_cache
         self.instructions_cache = instruction_cache
@@ -102,7 +102,12 @@ class Core(Thread):
             self.current_instruction = self.instructions_cache.get_word_from_address(self.pc)
             self.pc += 4
             self.decode_instruction()
+            try:
+                self.counter_barrier.wait()
+            except BrokenBarrierError:
+                print("reached bb error")
 
+        self.counter_barrier.abort()
         return 0
 
     def reset_registers(self):
