@@ -139,13 +139,11 @@ class Core(Thread):
             if self.waiting_cycles > 0 and self.data_bus.core_id == self.core_id:
                 self.waiting_cycles -= 1
                 self.data_bus.decrease_cycles()
-
             try:
                 self.counter_barrier.wait()
             except BrokenBarrierError:
-                print("reached bb error")
+                pass
 
-        self.counter_barrier.abort()
         return 0
 
     def reset_registers(self):

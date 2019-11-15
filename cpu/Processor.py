@@ -11,6 +11,7 @@ LOAD_INSTRUCTION_TO_CACHE = 10
 LOAD_DATA_TO_CACHE = 20
 WRITE_A_WORD = 5
 INVALIDATE_BLOCK = 1
+NUMBER_OF_CORES = 2
 
 
 class Processor:
@@ -22,7 +23,7 @@ class Processor:
         self.data_memory = Memory(0, 380)
         self.instructions_memory = Memory(24, 636)
         self.memory = Memory(0, 1024)
-        self.counter_barrier = Barrier(2, timeout=3)
+        self.counter_barrier = Barrier(NUMBER_OF_CORES, timeout=3)
         self.core_1_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
         self.core_1_instruction_cache = Cache(self.memory, LOAD_INSTRUCTION_TO_CACHE)
         self.core_2_instruction_cache = Cache(self.memory, LOAD_INSTRUCTION_TO_CACHE)
@@ -35,6 +36,7 @@ class Processor:
 
         self.contexts = []
         self.context_lock = Lock()
+
 
     # Processor methods
     def kick_start_program(self):
@@ -57,6 +59,7 @@ class Processor:
                 tries += 1
 
             program.taken = True
+
         return program
 
     def load_memory_instructions(self):
