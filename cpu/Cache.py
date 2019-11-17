@@ -178,7 +178,7 @@ class Cache:
         is_block_in_cache = self.is_block_in_cache(block_number)
         # store the word in cache if it is loaded
         if is_block_in_cache:
-            self._set_word_in_block(block_number, block_number, word, address)
+            self._set_word_in_block(block_number, word, address)
 
         # store in memory
         self.memory.set_value(word, address)

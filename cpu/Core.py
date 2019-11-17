@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Barrier, BrokenBarrierError
 from cpu.ProgramsContext import ProgramsContext
 from cpu.Cache import Cache
 from cpu.Instruction import Instruction
@@ -9,7 +9,8 @@ REGISTERS_AMOUNT = 32
 
 
 class Core(Thread):
-    def __init__(self, core_id, data_cache, instruction_cache, processor, data_bus, instruction_bus, foreign_data_cache):
+    def __init__(self, core_id, data_cache, instruction_cache, processor,
+                 data_bus, instruction_bus, foreign_data_cache, barrier):
         Thread.__init__(self)
         self.core_id = core_id
         self.registers = [0] * REGISTERS_AMOUNT
@@ -21,6 +22,7 @@ class Core(Thread):
         self.instructions_cache: Cache = instruction_cache
         self.foreign_data_cache: Cache = foreign_data_cache
         self.pc = -1
+        self.barrier: Barrier = barrier
 
         self.data_bus: Sync = data_bus
         self.instruction_bus: Sync = instruction_bus
@@ -125,10 +127,11 @@ class Core(Thread):
         if instruction_number == 999:
             # Save ending registers
             i = 0
-            while i < 30:
+            while i < len(self.registers):
                 self.actual_program.registers[i] = self.registers[i]
                 i += 1
             # TODO save clock
+            self.actual_program.ending_clock_cycle = self.processor.clock.get_clock()
             print('Program', self.actual_program.context_id, 'ended.')
 
             # Get next program to run it
@@ -136,16 +139,17 @@ class Core(Thread):
             self.actual_program.assigned_core = self.core_id
             self.actual_program.taken = True
             # TODO save starting clock
+            self.actual_program.starting_clock_cycle = self.processor.clock.get_clock()
             self.pc = self.actual_program.start_address
             self.reset_registers()
 
     def run(self):
         self.actual_program = self.processor.get_next_program()
-        print(self.core_id)
         time.sleep(3)
         self.actual_program.assigned_core = self.core_id
         self.actual_program.taken = True
         self.pc = self.actual_program.start_address
+        self.actual_program.starting_clock_cycle = self.processor.clock.get_clock()
         # TODO save starting clock
         while self.actual_program.context_id != -1:
             # set current instruction
@@ -155,10 +159,16 @@ class Core(Thread):
             if self.waiting_cycles > 0 and self.data_bus.core_id == self.core_id:
                 self.waiting_cycles -= 1
                 self.data_bus.decrease_cycles()
+            try:
+                self.barrier.wait()
+            except BrokenBarrierError:
+                pass
+            if self.core_id == 1:
+                self.processor.clock.next_cycle()
         return 0
 
     def reset_registers(self):
         i = 0
-        while i < REGISTERS_AMOUNT:
+        while i < len(self.registers):
             self.registers[i] = 0
             i += 1

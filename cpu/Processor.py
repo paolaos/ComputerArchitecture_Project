@@ -4,9 +4,11 @@ from cpu.Sync import Sync
 from cpu.Cache import Cache
 from cpu.ProgramsContextHelper import create_context
 from cpu.ProgramsContext import ProgramsContext
-from threading import Lock
+from cpu.Clock import Clock
+from threading import Lock, Barrier
 import os
 
+# required clock cycles
 LOAD_INSTRUCTION_TO_CACHE = 10
 LOAD_DATA_TO_CACHE = 20
 WRITE_A_WORD = 5
@@ -15,12 +17,13 @@ INVALIDATE_BLOCK = 1
 
 class Processor:
     def __init__(self):
-        self.clock = 0
+        self.clock = Clock()
         self.data_bus = Sync()
         self.instruction_bus = Sync()
         self.data_memory = Memory(0, 380)
         self.instructions_memory = Memory(24, 636)
         self.memory = Memory(0, 1024)
+        self.clock_barrier = Barrier(1, timeout=3)
 
         self.core_1_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
         self.core_1_instruction_cache = Cache(self.memory, LOAD_INSTRUCTION_TO_CACHE)
@@ -28,9 +31,9 @@ class Processor:
         self.core_2_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
 
         self.core_1 = Core(1, self.core_1_data_cache, self.core_1_instruction_cache, self, self.data_bus,
-                           self.instruction_bus, self.core_2_data_cache)
+                           self.instruction_bus, self.core_2_data_cache, self.clock_barrier)
         self.core_2 = Core(2, self.core_2_data_cache, self.core_2_instruction_cache, self, self.data_bus,
-                           self.instruction_bus, self.core_1_data_cache)
+                           self.instruction_bus, self.core_1_data_cache, self.clock_barrier)
 
         self.contexts = []
         self.context_lock = Lock()
@@ -39,9 +42,9 @@ class Processor:
     def kick_start_program(self):
         self.load_memory_instructions()
         self.core_1.start()
-        self.core_2.start()
+        # self.core_2.start()
         self.core_1.join()
-        self.core_2.join()
+        # self.core_2.join()
         self.print_final_execution_results()
         # todo add ending of the program
 
@@ -91,6 +94,8 @@ class Processor:
         return current_address
 
     def print_final_execution_results(self):
+        print("-------------EXECUTION RESULTS-------------")
+        print("Total execution cycles: ", self.clock.get_clock())
         print("Data memory:")
         self.memory.print_part_of_memory(0, 380)
         print("Data caches:")
@@ -102,7 +107,7 @@ class Processor:
         print("Program's results:")
         for program in self.contexts:
             print("Program", program.context_id, "was executed by core", program.assigned_core)
-            print("Execution time: ", program.ending_clock_cycle - program.starting_clock_cycle)
+            print("Execution clock cycles: ", program.ending_clock_cycle - program.starting_clock_cycle)
             print("Final registers:")
             program.print_registers()
             print()
