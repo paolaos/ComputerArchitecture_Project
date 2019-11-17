@@ -118,13 +118,13 @@ class Core(Thread):
         if instruction_number == 111:
             # jal
             self.registers[self.current_instruction.op1] = self.pc
-            self.pc = self.pc + self.current_instruction.op2
+            self.pc = self.pc + self.current_instruction.op3 + 4
             # todo check this
 
         if instruction_number == 103:
             # jalr
             self.registers[self.current_instruction.op1] = self.pc
-            self.pc = self.current_instruction.op2 + self.current_instruction.op3
+            self.pc = self.registers[self.current_instruction.op2] + self.current_instruction.op3 + 4
 
         if instruction_number == 999:
             # Save ending registers
