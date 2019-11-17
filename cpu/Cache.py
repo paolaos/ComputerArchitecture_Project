@@ -70,13 +70,13 @@ class Cache:
         if self.is_block_in_cache(block_id):
             line = self._get_block_line(block_id)
             if line == 0:
-                self.cache_line_0.status(False)
+                self.cache_line_0.status = False
             if line == 1:
-                self.cache_line_1.status(False)
+                self.cache_line_1.status = False
             if line == 2:
-                self.cache_line_2.status(False)
+                self.cache_line_2.status = False
             if line == 3:
-                self.cache_line_3.status(False)
+                self.cache_line_3.status = False
 
     def store_block_to_cache(self, block):
         """
@@ -180,8 +180,11 @@ class Cache:
         if is_block_in_cache:
             self._set_word_in_block(block_number, word, address)
 
-        # store in memory
-        self.memory.set_value(word, address)
+        # store in data memory
+        if address < 384:
+            self.memory.set_value(word, address)
+        else:
+            print("Invalid data memory address ", address)
 
     def print_cache(self):
         self.cache_line_0.print_cache_line()

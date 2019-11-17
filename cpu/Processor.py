@@ -17,13 +17,14 @@ INVALIDATE_BLOCK = 1
 
 class Processor:
     def __init__(self):
-        self.clock = Clock()
         self.data_bus = Sync()
         self.instruction_bus = Sync()
         self.data_memory = Memory(0, 380)
         self.instructions_memory = Memory(24, 636)
         self.memory = Memory(0, 1024)
-        self.clock_barrier = Barrier(1, timeout=3)
+        self.threads = 2
+        self.clock = Clock()
+        self.clock_barrier = Barrier(self.threads)
 
         self.core_1_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
         self.core_1_instruction_cache = Cache(self.memory, LOAD_INSTRUCTION_TO_CACHE)
@@ -42,11 +43,10 @@ class Processor:
     def kick_start_program(self):
         self.load_memory_instructions()
         self.core_1.start()
-        # self.core_2.start()
+        self.core_2.start()
         self.core_1.join()
-        # self.core_2.join()
+        self.core_2.join()
         self.print_final_execution_results()
-        # todo add ending of the program
 
     def get_next_program(self):
         program: ProgramsContext = ProgramsContext()
@@ -103,7 +103,6 @@ class Processor:
         self.core_1.data_cache.print_cache()
         print("Core 2:")
         self.core_2.data_cache.print_cache()
-        # todo print data caches for both cores
         print("Program's results:")
         for program in self.contexts:
             print("Program", program.context_id, "was executed by core", program.assigned_core)

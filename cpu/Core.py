@@ -1,4 +1,4 @@
-from threading import Thread, Barrier, BrokenBarrierError
+from threading import Thread, Barrier, BrokenBarrierError, active_count
 from cpu.ProgramsContext import ProgramsContext
 from cpu.Cache import Cache
 from cpu.Instruction import Instruction
@@ -22,7 +22,6 @@ class Core(Thread):
         self.instructions_cache: Cache = instruction_cache
         self.foreign_data_cache: Cache = foreign_data_cache
         self.pc = -1
-        self.barrier: Barrier = barrier
 
         self.data_bus: Sync = data_bus
         self.instruction_bus: Sync = instruction_bus
@@ -71,13 +70,15 @@ class Core(Thread):
             # load
             register = self.current_instruction.op1
             n = self.current_instruction.op3 + self.registers[self.current_instruction.op2]
-            self.waiting_cycles = self.data_cache.get_loading_cycles(n)
-            if self.waiting_cycles == 0:
+            required_cycles = self.data_cache.get_loading_cycles(n)
+            if required_cycles == 0:
                 # doesn't need the bus because it's a hit
                 self.registers[register] = self.data_cache.get_word_from_address(n)
+                self.waiting_cycles = 0
                 self.pc += 4
-            elif self.waiting_cycles > 0 and self.data_bus.get_resource(self.waiting_cycles, self.core_id):
+            elif required_cycles > 0 and self.data_bus.get_resource(required_cycles, self.core_id):
                 # need the bus because it's a miss
+                self.waiting_cycles = required_cycles
                 self.registers[register] = self.data_cache.get_word_from_address(n)
                 self.pc += 4
 
@@ -86,10 +87,11 @@ class Core(Thread):
             register = self.current_instruction.op2
             n = self.current_instruction.op3
             address = n + self.registers[self.current_instruction.op1]
-            self.waiting_cycles = 6
-            if self.data_bus.get_resource(self.waiting_cycles, self.core_id):
+            required_cycles = 6
+            if self.data_bus.get_resource(required_cycles, self.core_id):
                 # if the bus is available
                 # invalidate block in the other cache
+                self.waiting_cycles = required_cycles
                 self.foreign_data_cache.invalidate_block(address)
                 # store data
                 self.data_cache.store_word(self.registers[register], address)
@@ -130,7 +132,6 @@ class Core(Thread):
             while i < len(self.registers):
                 self.actual_program.registers[i] = self.registers[i]
                 i += 1
-            # TODO save clock
             self.actual_program.ending_clock_cycle = self.processor.clock.get_clock()
             print('Program', self.actual_program.context_id, 'ended.')
 
@@ -138,19 +139,16 @@ class Core(Thread):
             self.actual_program: ProgramsContext = self.processor.get_next_program()
             self.actual_program.assigned_core = self.core_id
             self.actual_program.taken = True
-            # TODO save starting clock
             self.actual_program.starting_clock_cycle = self.processor.clock.get_clock()
             self.pc = self.actual_program.start_address
             self.reset_registers()
 
     def run(self):
         self.actual_program = self.processor.get_next_program()
-        time.sleep(3)
         self.actual_program.assigned_core = self.core_id
         self.actual_program.taken = True
         self.pc = self.actual_program.start_address
         self.actual_program.starting_clock_cycle = self.processor.clock.get_clock()
-        # TODO save starting clock
         while self.actual_program.context_id != -1:
             # set current instruction
             self.current_instruction = self.instructions_cache.get_word_from_address(self.pc)
@@ -159,12 +157,13 @@ class Core(Thread):
             if self.waiting_cycles > 0 and self.data_bus.core_id == self.core_id:
                 self.waiting_cycles -= 1
                 self.data_bus.decrease_cycles()
-            try:
-                self.barrier.wait()
-            except BrokenBarrierError:
-                pass
-            if self.core_id == 1:
-                self.processor.clock.next_cycle()
+            self.processor.clock.wait_for_next_cycle()
+
+        self.processor.clock.remove_thread()
+
+        while self.processor.clock.thread_count > 0:
+            self.processor.clock.wait_for_next_cycle()
+        print("Core ", self.core_id, " ended.")
         return 0
 
     def reset_registers(self):
