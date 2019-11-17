@@ -10,7 +10,7 @@ REGISTERS_AMOUNT = 32
 
 class Core(Thread):
     def __init__(self, core_id, data_cache, instruction_cache, processor,
-                 data_bus, instruction_bus, foreign_data_cache, barrier):
+                 data_bus, instruction_bus, foreign_data_cache):
         Thread.__init__(self)
         self.core_id = core_id
         self.registers = [0] * REGISTERS_AMOUNT
@@ -163,7 +163,6 @@ class Core(Thread):
 
         while self.processor.clock.thread_count > 0:
             self.processor.clock.wait_for_next_cycle()
-        print("Core ", self.core_id, " ended.")
         return 0
 
     def reset_registers(self):

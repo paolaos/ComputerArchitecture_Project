@@ -5,7 +5,7 @@ from cpu.Cache import Cache
 from cpu.ProgramsContextHelper import create_context
 from cpu.ProgramsContext import ProgramsContext
 from cpu.Clock import Clock
-from threading import Lock, Barrier
+from threading import Lock
 import os
 
 # required clock cycles
@@ -24,7 +24,6 @@ class Processor:
         self.memory = Memory(0, 1024)
         self.threads = 2
         self.clock = Clock()
-        self.clock_barrier = Barrier(self.threads)
 
         self.core_1_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
         self.core_1_instruction_cache = Cache(self.memory, LOAD_INSTRUCTION_TO_CACHE)
@@ -32,9 +31,9 @@ class Processor:
         self.core_2_data_cache = Cache(self.memory, LOAD_DATA_TO_CACHE)
 
         self.core_1 = Core(1, self.core_1_data_cache, self.core_1_instruction_cache, self, self.data_bus,
-                           self.instruction_bus, self.core_2_data_cache, self.clock_barrier)
+                           self.instruction_bus, self.core_2_data_cache)
         self.core_2 = Core(2, self.core_2_data_cache, self.core_2_instruction_cache, self, self.data_bus,
-                           self.instruction_bus, self.core_1_data_cache, self.clock_barrier)
+                           self.instruction_bus, self.core_1_data_cache)
 
         self.contexts = []
         self.context_lock = Lock()
