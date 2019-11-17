@@ -73,13 +73,13 @@ class Core(Thread):
             required_cycles = self.data_cache.get_loading_cycles(n)
             if required_cycles == 0:
                 # doesn't need the bus because it's a hit
-                self.registers[register] = self.data_cache.get_word_from_address(n)
+                self.registers[register] = n
                 self.waiting_cycles = 0
                 self.pc += 4
             elif required_cycles > 0 and self.data_bus.get_resource(required_cycles, self.core_id):
                 # need the bus because it's a miss
                 self.waiting_cycles = required_cycles
-                self.registers[register] = self.data_cache.get_word_from_address(n)
+                self.registers[register] = n
                 self.pc += 4
 
         if instruction_number == 37:
@@ -102,7 +102,7 @@ class Core(Thread):
             x1 = self.registers[self.current_instruction.op1]
             x2 = self.registers[self.current_instruction.op2]
             if x1 == x2:
-                self.pc += 4 * self.current_instruction.op3
+                self.pc += 4 * (self.current_instruction.op3 + 1)
             else:
                 self.pc += 4
 
@@ -111,7 +111,7 @@ class Core(Thread):
             x1 = self.registers[self.current_instruction.op1]
             x2 = self.registers[self.current_instruction.op2]
             if x1 != x2:
-                self.pc += 4 * self.current_instruction.op3
+                self.pc += 4 * (self.current_instruction.op3 + 1)
             else:
                 self.pc += 4
 
