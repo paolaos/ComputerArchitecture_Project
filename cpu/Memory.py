@@ -52,3 +52,15 @@ class Memory:
                   self.memory[i+8], "\t", self.memory[i+9], "\t", self.memory[i+10], "\t", self.memory[i+11], "\t|\t",
                   self.memory[i+12], "\t", self.memory[i+13], "\t", self.memory[i+14], "\t", self.memory[i+15], "\t|\t")
             i += 16
+
+    def print_part_of_memory(self, start, end):
+        i = start
+        while i < end / 4:
+            print(self.memory[i], "\t", self.memory[i + 1], "\t", self.memory[i + 2], "\t", self.memory[i + 3], "\t|\t",
+                  self.memory[i + 4], "\t", self.memory[i + 5], "\t", self.memory[i + 6], "\t", self.memory[i + 7],
+                  "\t|\t",
+                  self.memory[i + 8], "\t", self.memory[i + 9], "\t", self.memory[i + 10], "\t", self.memory[i + 11],
+                  "\t|\t",
+                  self.memory[i + 12], "\t", self.memory[i + 13], "\t", self.memory[i + 14], "\t", self.memory[i + 15],
+                  "\t|\t")
+            i += 16

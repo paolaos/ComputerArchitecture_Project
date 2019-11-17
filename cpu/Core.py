@@ -94,24 +94,40 @@ class Core(Thread):
                 self.pc += 4
 
         if instruction_number == 99:
-            print('Branch eq')
-            self.pc += 4
+            # Branch eq
+            x1 = self.registers[self.current_instruction.op1]
+            x2 = self.registers[self.current_instruction.op2]
+            if x1 == x2:
+                self.pc += 4 * self.current_instruction.op3
+            else:
+                self.pc += 4
 
         if instruction_number == 100:
-            print('Branch ne')
-            self.pc += 4
+            # Branch ne
+            x1 = self.registers[self.current_instruction.op1]
+            x2 = self.registers[self.current_instruction.op2]
+            if x1 != x2:
+                self.pc += 4 * self.current_instruction.op3
+            else:
+                self.pc += 4
 
         if instruction_number == 111:
-            print('jal')
-            self.pc += 4
+            # jal
+            self.registers[self.current_instruction.op1] = self.pc
+            self.pc = self.pc + self.current_instruction.op2
+            # todo check this
 
         if instruction_number == 103:
-            print('jalr')
-            self.pc += 4
+            # jalr
+            self.registers[self.current_instruction.op1] = self.pc
+            self.pc = self.current_instruction.op2 + self.current_instruction.op3
 
         if instruction_number == 999:
             # Save ending registers
-            self.actual_program.registers = self.registers
+            i = 0
+            while i < 30:
+                self.actual_program.registers[i] = self.registers[i]
+                i += 1
             # TODO save clock
             print('Program', self.actual_program.context_id, 'ended.')
 
@@ -121,6 +137,7 @@ class Core(Thread):
             self.actual_program.taken = True
             # TODO save starting clock
             self.pc = self.actual_program.start_address
+            self.reset_registers()
 
     def run(self):
         self.actual_program = self.processor.get_next_program()

@@ -182,3 +182,10 @@ class Cache:
 
         # store in memory
         self.memory.set_value(word, address)
+
+    def print_cache(self):
+        self.cache_line_0.print_cache_line()
+        self.cache_line_1.print_cache_line()
+        self.cache_line_2.print_cache_line()
+        self.cache_line_3.print_cache_line()
+        print()

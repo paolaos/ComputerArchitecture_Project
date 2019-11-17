@@ -42,8 +42,7 @@ class Processor:
         self.core_2.start()
         self.core_1.join()
         self.core_2.join()
-        self.print_final_program_context()
-        self.memory.print_memory()
+        self.print_final_execution_results()
         # todo add ending of the program
 
     def get_next_program(self):
@@ -91,9 +90,19 @@ class Processor:
 
         return current_address
 
-    def print_final_program_context(self):
+    def print_final_execution_results(self):
+        print("Data memory:")
+        self.memory.print_part_of_memory(0, 380)
+        print("Data caches:")
+        print("Core 1:")
+        self.core_1.data_cache.print_cache()
+        print("Core 2:")
+        self.core_2.data_cache.print_cache()
+        # todo print data caches for both cores
         print("Program's results:")
         for program in self.contexts:
             print("Program", program.context_id, "was executed by core", program.assigned_core)
+            print("Execution time: ", program.ending_clock_cycle - program.starting_clock_cycle)
             print("Final registers:")
             program.print_registers()
+            print()
