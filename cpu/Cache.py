@@ -34,6 +34,8 @@ class Cache:
         if line == 3:
             block = self.cache_line_3.block
 
+        block.block_id = block_id
+
         if word_number == 0:
             block.word_0 = word
         if word_number == 1:
@@ -177,7 +179,7 @@ class Cache:
         block_number = self.get_block_number_from_address(address)
         is_block_in_cache = self.is_block_in_cache(block_number)
         # store the word in cache if it is loaded
-        if is_block_in_cache:
+        if not is_block_in_cache:
             self._set_word_in_block(block_number, word, address)
 
         # store in data memory
