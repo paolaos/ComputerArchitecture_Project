@@ -1,4 +1,4 @@
-from cpu.Block import Block
+from Block import Block
 
 
 class CacheLine:
@@ -7,9 +7,16 @@ class CacheLine:
         self.block = Block()
 
     def get_block_id(self):
+        """
+        Get the block id of the block stored in a cache line
+        :return: Current block id
+        """
         return self.block.block_id
 
     def print_cache_line(self):
+        """
+        Print the contents of a cache line
+        """
         status = "I"
         if self.status:
             status = "C"

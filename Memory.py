@@ -1,5 +1,5 @@
-from cpu.Block import Block
-from cpu.Instruction import Instruction
+from Block import Block
+from Instruction import Instruction
 
 BLOCK_SIZE = 16
 

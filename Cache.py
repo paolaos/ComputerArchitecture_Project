@@ -1,5 +1,5 @@
-from cpu.CacheLine import CacheLine
-from cpu.Memory import Memory
+from CacheLine import CacheLine
+from Memory import Memory
 
 BLOCK_SIZE = 16
 
@@ -134,9 +134,8 @@ class Cache:
 
     def load_block(self, address):
         """
-
-        :param address:
-        :return:
+        Load a block from memory
+        :param address: the block's address
         """
         block_number = self.get_block_number_from_address(address)
         block = self.memory.get_block(block_number)
@@ -176,6 +175,11 @@ class Cache:
             return self.cycles_to_load
 
     def store_word(self, word, address):
+        """
+        Store a word in memory
+        :param word: the new contents of the word
+        :param address: the memory address of the word
+        """
         block_number = self.get_block_number_from_address(address)
         is_block_in_cache = self.is_block_in_cache(block_number)
         # store the word in cache if it is loaded
@@ -189,6 +193,9 @@ class Cache:
             print("Invalid data memory address ", address)
 
     def print_cache(self):
+        """
+        Print the contents of the cache
+        """
         self.cache_line_0.print_cache_line()
         self.cache_line_1.print_cache_line()
         self.cache_line_2.print_cache_line()

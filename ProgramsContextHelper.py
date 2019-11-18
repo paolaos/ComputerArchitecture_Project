@@ -1,4 +1,4 @@
-from cpu.ProgramsContext import ProgramsContext
+from ProgramsContext import ProgramsContext
 
 
 def save_context(program_context: ProgramsContext, context: []):

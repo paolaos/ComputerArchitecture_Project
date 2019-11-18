@@ -1,9 +1,8 @@
-from threading import Thread, Barrier, BrokenBarrierError, active_count
-from cpu.ProgramsContext import ProgramsContext
-from cpu.Cache import Cache
-from cpu.Instruction import Instruction
-from cpu.Sync import Sync
-import time
+from threading import Thread
+from ProgramsContext import ProgramsContext
+from Cache import Cache
+from Instruction import Instruction
+from Sync import Sync
 
 REGISTERS_AMOUNT = 32
 
@@ -120,7 +119,6 @@ class Core(Thread):
             # jal
             self.registers[self.current_instruction.op1] = self.pc
             self.pc = self.pc + self.current_instruction.op3 + 4
-            # todo check this
 
         if instruction_number == 103:
             # jalr

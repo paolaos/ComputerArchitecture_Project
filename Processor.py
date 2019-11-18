@@ -1,10 +1,10 @@
-from cpu.Memory import Memory
-from cpu.Core import Core
-from cpu.Sync import Sync
-from cpu.Cache import Cache
-from cpu.ProgramsContextHelper import create_context
-from cpu.ProgramsContext import ProgramsContext
-from cpu.Clock import Clock
+from Memory import Memory
+from Core import Core
+from Sync import Sync
+from Cache import Cache
+from ProgramsContextHelper import create_context
+from ProgramsContext import ProgramsContext
+from Clock import Clock
 from threading import Lock
 import os
 
@@ -40,6 +40,10 @@ class Processor:
 
     # Processor methods
     def kick_start_program(self):
+        """
+        Do the necessary things to start the simulation: Load the programs in memory and start the threads
+        :return:
+        """
         self.load_memory_instructions()
         self.core_1.start()
         self.core_2.start()
@@ -48,6 +52,10 @@ class Processor:
         self.print_final_execution_results()
 
     def get_next_program(self):
+        """
+        Get the next program (hilillo) that is pending to run
+        :return: Program context of the next program to run
+        """
         program: ProgramsContext = ProgramsContext()
         tries = 0
         with self.context_lock:
@@ -60,10 +68,13 @@ class Processor:
         return program
 
     def load_memory_instructions(self):
+        """
+        Opens the files from the assets folder and stores the instructions of each program
+        """
         current_file_number = 0
         current_address = 384
-        for file_name in os.listdir('../assets'):
-            file_ = open('../assets/' + file_name, 'r')
+        for file_name in os.listdir('./assets'):
+            file_ = open('./assets/' + file_name, 'r')
             create_context(current_file_number, current_address, self.contexts)
             current_address = self.store_instructions_in_memory(file_, current_address, file_name)
             print("Uploaded ", file_name, "as program ", current_file_number)
@@ -93,6 +104,9 @@ class Processor:
         return current_address
 
     def print_final_execution_results(self):
+        """
+        Print the final execution results from the simulation
+        """
         print("-------------EXECUTION RESULTS-------------")
         print("Total execution cycles: ", self.clock.get_clock())
         print("Data memory:")

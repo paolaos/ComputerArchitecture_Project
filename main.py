@@ -1,4 +1,10 @@
-from cpu.Processor import Processor
+from Processor import Processor
+
+'''
+Final project Computer Architecture
+- Paola Ortega
+- Valeria Zamora
+'''
 
 
 def main():
