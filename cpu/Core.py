@@ -79,6 +79,7 @@ class Core(Thread):
             elif required_cycles > 0 and self.data_bus.get_resource(required_cycles, self.core_id):
                 # need the bus because it's a miss
                 self.waiting_cycles = required_cycles
+                self.data_cache.load_block(n)
                 self.registers[register] = n
                 self.pc += 4
 
