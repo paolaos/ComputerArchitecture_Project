@@ -8,6 +8,11 @@ REGISTERS_AMOUNT = 32
 
 
 class Core(Thread):
+    """
+    Synchronised abstract representation of a CPU's core. Belongs to a specific
+    processor. Shares resources with another core such as buses, but has its own
+    resources such as its data and instruction caches
+    """
     def __init__(self, core_id, data_cache, instruction_cache, processor,
                  data_bus, instruction_bus, foreign_data_cache):
         Thread.__init__(self)
@@ -28,6 +33,12 @@ class Core(Thread):
         self.waiting_cycles = 0
 
     def decode_instruction(self):
+        """
+        Executes the code of a reduced RISC-V instruction set based on what is read
+        from the instructions.
+        """
+
+        # reads first parameter of the current instruction)
         instruction_number = self.current_instruction.code
 
         if instruction_number == 19:
@@ -143,6 +154,11 @@ class Core(Thread):
             self.reset_registers()
 
     def run(self):
+        """
+        Synchronised method in charge of executing programs and its instructions as
+        long as there are still programs to run.
+        :return: 0 if the cores managed to run all programmes successfully.
+        """
         self.actual_program = self.processor.get_next_program()
         self.actual_program.assigned_core = self.core_id
         self.actual_program.taken = True
@@ -158,13 +174,23 @@ class Core(Thread):
                 self.data_bus.decrease_cycles()
             self.processor.clock.wait_for_next_cycle()
 
+        # is finished executing programmes.
+        # detaches from the barrier in order to avoid any synchronisation conflicts
         self.processor.clock.remove_thread()
 
+        # in order to not raise barrier exceptions, keeps waiting cycle after cycle
+        # until the other core is finished.
         while self.processor.clock.thread_count > 0:
             self.processor.clock.wait_for_next_cycle()
+
         return 0
 
     def reset_registers(self):
+        """
+        Replaces values in its register to zero in order to clear everything for
+        a new programme context.
+        :return:
+        """
         i = 0
         while i < len(self.registers):
             self.registers[i] = 0
