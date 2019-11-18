@@ -12,7 +12,7 @@ class Cache:
         self.cache_line_3 = CacheLine()
         self.size = 4
         self.memory: Memory = memory
-        self.cycles_to_load = cycles_to_load
+        self.cycles_to_load = cycles_to_load        # amount of cycles required to load data
 
     def _get_block_line(self, block_id):
         """
@@ -23,6 +23,13 @@ class Cache:
         return int(block_id % self.size)
 
     def _set_word_in_block(self, block_id, word, address):
+        """
+        Set a word in a block in cache
+        :param block_id: The block's id
+        :param word: The new word
+        :param address: The word's address
+        """
+        block = None
         line = self._get_block_line(block_id)
         word_number = self.get_word_number_from_address(address)
         if line == 0:
@@ -101,7 +108,7 @@ class Cache:
 
     def _get_block(self, block_id):
         """
-        Get the block
+        Retrieve a block from an id if the block is in the cache
         :param block_id: the id of the block to be retrieved
         :return: the block
         """
@@ -115,20 +122,22 @@ class Cache:
                 return self.cache_line_2.block
             if line == 3:
                 return self.cache_line_3.block
+        else:
+            return None
 
     def get_block_number_from_address(self, address):
         """
-
-        :param address:
-        :return:
+        Determine the block number (id) for a given address
+        :param address: the address
+        :return: the block number
         """
         return int(address // BLOCK_SIZE)
 
     def get_word_number_from_address(self, address):
         """
-
-        :param address:
-        :return:
+        Determine the word number from a given address
+        :param address: the address
+        :return: the word number
         """
         return int(address % BLOCK_SIZE)
 
